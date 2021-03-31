@@ -2,7 +2,7 @@
 
 Retrieve and save all WiFi networks and passwords on the device.  
 
-Plans for cross platform support, currently windows only.
+Cross Platform: Windows, MacOS, Linux
 
 ![example](docs/example_screenshot.png)
 
@@ -11,17 +11,17 @@ Features
 - Displays all WiFi profiles on a device
 - Current network is highlighted
 - Can save networks as **.JSON** or **wpa_supplicant.conf** file for use on other devices
-- Able to show current DNS config (Windows only at present)
+- Able to show current DNS config
 - Able to show visible WiFi networks 
 - Portable or installable versions
 - Tested in Python 3.6 - 3.9
-- Tested on Windows 10
+- Tested on Windows 10, macOS 10.14 (Mojave) and Ubuntu 20.04
 
 Installation
 ------------
 Installed with the binary files under releases.  
 Portable and installer versions are supplied.  
-Currently windows only.  
+
 Binary release are signed with a self signed certificate, can also be packaged from source with below instructions. 
 
 Usage
@@ -30,8 +30,8 @@ Either run the portable exe or if installed run from the start menu.
 
 If the source is downloaded run from the ```wifipasswordsgui.py```
 
-Packaging as EXE
-----------------
+Packaging
+---------
 Can be packaged to a portable EXE on windows with:  
 ``pyinstaller --clean --noconsole --onefile -i icons8-flatcolor-unlock.ico wifipasswordsgui.py``  
 
@@ -51,19 +51,21 @@ It is notably faster to load the program from a single directory pyinstaller out
 To-Do
 -----
 - [X] Add highlighting for currently connected network
-- [ ] Add macOS Support
-- [ ] Add linux support
+- [X] Add macOS Support
+- [X] Add linux support
 - [ ] Add automated tests
 - [ ] Add settings for filename selection
 - [ ] Add manual override for dark/light mode
 - [ ] Add licence info on the about /settings page
 - [ ] Reorganise GUI code
+- [ ] Dark Mode for linux
+- [ ] Fix column widths for linux
 
 About
 -----
-Creation date: 15-01-2021
-Modified date: 24-03-2021  
-Dependencies: wifipasswords, PyQt5  
+Creation date: 15-01-2021  
+Modified date: 31-03-2021  
+Dependencies: wifipasswords, PyQt5   
 
 Icon provided by [Icon8](https://github.com/icons8/flat-color-icons) under the MIT / Good Boy licence. See project page for details.  
 

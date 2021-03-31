@@ -3,7 +3,7 @@
     GUI for viewing wifi passwords.
     Windows support only at present -macos and linux in progress.
     Creation date: 15-01-2021
-    Modified date: 24-03-2021
+    Modified date: 31-03-2021
     Dependencies: wifipasswords, pyqt5
 """
 
@@ -24,7 +24,7 @@ __copyright__ = "Copyright (C) 2021 Joe Campbell"
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see < https: // www.gnu.org/licenses/>.
 
-__version__ = "0.1.0-beta"
+__version__ = "0.1.1-beta"
 __licence__ = "GPLv3"  # GNU General Public Licence v3
 
 from wifipasswords import WifiPasswords
@@ -33,12 +33,13 @@ from wifipasswords import __version__ as wifipasswords_version
 import os
 import sys
 import json
+import time
 import locale
 from datetime import datetime
 import platform
 from PyQt5.QtWidgets import (QCheckBox, QComboBox, QDialog, QFileDialog, QFrame, QGridLayout, QHBoxLayout, QLabel, QLineEdit, QApplication, QMessageBox, 
                             QPushButton, QTextEdit, QTableWidget, QTableWidgetItem, QVBoxLayout, QStyleFactory)
-from PyQt5.QtGui import QColor, QFont, QIcon, QPalette
+from PyQt5.QtGui import QColor, QIcon, QPalette
 from PyQt5.QtCore import Qt, QThread, QObject,pyqtSignal
 
 ############################ CLASSES ############################
@@ -51,6 +52,8 @@ class WifiPasswordsGUI(QDialog):
         QApplication.setStyle(QStyleFactory.create('fusion'))
         QApplication.setPalette(self.original_palette)
         
+        self.platform = platform.system()
+
         if self.detect_darkmode_in_windows():
             self.dark_mode = True
             self.set_dark_palette(self)
@@ -95,7 +98,7 @@ class WifiPasswordsGUI(QDialog):
         self.worker.finished_sig.connect(self.thread.quit)
         self.worker.finished_sig.connect(self.worker.deleteLater)
         self.worker.finished_sig.connect(self.thread.deleteLater)
-        self.worker.finished_sig.connect(lambda: self.buttons_disabled(False))
+        self.worker.data_sig.connect(lambda: self.buttons_disabled(False))
         self.worker.data_sig.connect(self.set_table_data)
         self.thread.start()
 
@@ -206,7 +209,6 @@ class WifiPasswordsGUI(QDialog):
         dark_palette.setColor(QPalette.Highlight, QColor(42, 130, 218))
         dark_palette.setColor(QPalette.HighlightedText, Qt.black)
         dark_palette.setColor(QPalette.Disabled, QPalette.ButtonText, Qt.gray)
-
         app.setPalette(dark_palette)
 
 
@@ -320,6 +322,9 @@ class SettingsAndAboutDialog(QDialog):
 
         self.wifipasswords_version_label = QLabel("wifipaswords version          : {}\n".format(wifipasswords_version))
         self.gui_version_label = QLabel("wifipasswords GUI version : {}\n".format(__version__))
+        self.webpage_label = QLabel(
+            '''<a href="https://github.com/needs-coffee/wifipasswords" style="color:#4287f5;">github.com/needs-coffee/wifipasswords</a>''')
+        self.webpage_label.setOpenExternalLinks(True)
 
         close_button = QPushButton('Close')
         close_button.clicked.connect(self.accept)
@@ -327,6 +332,7 @@ class SettingsAndAboutDialog(QDialog):
         # layout.addWidget(self.title_label)
         layout.addWidget(self.wifipasswords_version_label)
         layout.addWidget(self.gui_version_label)
+        layout.addWidget(self.webpage_label)
         layout.addSpacing(10)
         layout.addWidget(close_button)
         self.setLayout(layout)
@@ -337,9 +343,14 @@ class SaveData(QDialog):
         super().__init__(parent)
 
         # set the default save directory to the users desktop.
-        self.save_directory = os.path.join(
-            os.environ['USERPROFILE'], 'Desktop')
-        
+        plat = platform.system()
+        if plat == 'Windows':
+            self.save_directory = os.path.join(os.path.expanduser('~'), 'Desktop')
+        elif plat == 'Linux':
+            self.save_directory = os.path.join(os.path.expanduser('~'))
+        elif plat == 'Darwin':
+            self.save_directory = os.path.join(os.path.expanduser('~'))
+
         self.json_filename = 'networks_data.json'
         self.wpa_supplicant_filename = 'wpa_supplicant.conf'
         
@@ -571,6 +582,7 @@ class SaveData(QDialog):
         dark_palette.setColor(QPalette.Highlight, QColor(42, 130, 218))
         dark_palette.setColor(QPalette.HighlightedText, Qt.black)
         dark_palette.setColor(QPalette.Disabled, QPalette.ButtonText, Qt.gray)
+        dark_palette.setColor(QPalette.link, Qt.white)
 
         app.setPalette(dark_palette)
 
@@ -638,8 +650,13 @@ class GetDataWorker(QObject):
     def run(self):
         # net_data = wifipw.get_passwords_dummy(2,20)
         net_data = wifipw.get_passwords()
+        if not net_data:
+            net_data = {
+            'No passwords found.': {'auth': ' ', 'psk': ' ', 'metered': False, 'macrandom': 'Disabled'}
+            }
         connected = wifipw.get_currently_connected_ssids()
         self.data_sig.emit(net_data,connected)
+        time.sleep(0.5)
         self.finished_sig.emit()
 
 
