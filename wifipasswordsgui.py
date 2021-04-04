@@ -33,7 +33,6 @@ from wifipasswords import __version__ as wifipasswords_version
 import os
 import sys
 import json
-import time
 import locale
 from datetime import datetime
 import platform
@@ -95,11 +94,11 @@ class WifiPasswordsGUI(QDialog):
         self.worker = GetDataWorker()
         self.worker.moveToThread(self.thread)
         self.thread.started.connect(self.worker.run)
-        self.worker.finished_sig.connect(self.thread.quit)
-        self.worker.finished_sig.connect(self.worker.deleteLater)
-        self.worker.finished_sig.connect(self.thread.deleteLater)
-        self.worker.data_sig.connect(lambda: self.buttons_disabled(False))
         self.worker.data_sig.connect(self.set_table_data)
+        self.worker.data_sig.connect(lambda: self.buttons_disabled(False))
+        # self.worker.finished_sig.connect(self.thread.quit)
+        # self.worker.finished_sig.connect(self.thread.deleteLater)
+        # self.worker.finished_sig.connect(self.worker.deleteLater)
         self.thread.start()
 
 
@@ -656,8 +655,8 @@ class GetDataWorker(QObject):
             }
         connected = wifipw.get_currently_connected_ssids()
         self.data_sig.emit(net_data,connected)
-        time.sleep(0.5)
-        self.finished_sig.emit()
+        # time.sleep(4)
+        # self.finished_sig.emit()
 
 
 ############################ MAIN APPLICATON ############################
