@@ -64,7 +64,7 @@ To-Do
 About
 -----
 Creation date: 15-01-2021  
-Modified date: 31-03-2021  
+Modified date: 04-04-2021  
 Dependencies: wifipasswords, PyQt5   
 
 Icon provided by [Icon8](https://github.com/icons8/flat-color-icons) under the MIT / Good Boy licence. See project page for details.  
