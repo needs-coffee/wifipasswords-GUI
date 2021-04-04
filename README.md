@@ -2,6 +2,8 @@
 
 Retrieve and save all WiFi networks and passwords on the device.  
 
+uses the python library [wifipasswords](https://github.com/needs-coffee/wifipasswords) to read the passwords from the system.
+
 Cross Platform: Windows, MacOS, Linux
 
 ![example](docs/example_screenshot.png)
